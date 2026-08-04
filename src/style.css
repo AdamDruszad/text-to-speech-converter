@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sherpa-blue: #003d4d;
+  --color-caribbian-green: #00c996;
+  --color-textarea: #55B58E;
+  --color-button: #54c4a2;
+  --color-select: #50B9BF;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+  }
+}
