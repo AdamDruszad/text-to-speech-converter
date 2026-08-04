@@ -7,8 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
     content="A free, browser-based text-to-speech converter. Type or paste any text, pick a voice, and listen instantly — no sign-up required." />
+
+  <!-- preconnect to Google Fonts so the browser starts the TLS handshake early -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet" />
+
   <link href="/src/style.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
   <title>Text To Speech Converter</title>
 </head>
 
@@ -19,7 +25,7 @@
   <div id="error-card"
     class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-50 px-4 py-3 text-red-800 shadow-lg">
     <span id="error-text" class="text-sm"></span>
-    <button id="close-error-btn" class="text-red-500 hover:text-red-700 cursor-pointer">
+    <button id="close-error-btn" class="text-red-500 hover:text-red-700 cursor-pointer" aria-label="Close error">
       ✕
     </button>
   </div>
@@ -29,11 +35,12 @@
     <!-- Header -->
     <header class="site-header">
       <a href="/" class="logo">
-        <i class="ti ti-volume text-lg"></i>
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.7 5a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         TTS Converter
       </a>
       <a href="https://github.com/AdamDruszad" target="_blank" rel="noopener noreferrer" class="nav-link">
-        <i class="ti ti-brand-github mr-1"></i>Portfolio
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Portfolio
       </a>
     </header>
 
@@ -51,12 +58,12 @@
 
         <div class="w-full flex flex-col sm:flex-row items-stretch gap-3">
           <div class="flex-1 relative group">
+            <label for="voice-select" class="sr-only">Select voice</label>
             <select id="voice-select" class="select-muted"></select>
-            <i
-              class="ti ti-caret-down absolute text-lg right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180"></i>
+            <svg class="icon absolute right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6l6 -6"/></svg>
           </div>
           <button id="play-btn" class="btn-primary w-full sm:w-auto">
-            <i id="play-icon" class="ti ti-player-play text-lg"></i>
+            <svg id="play-icon" class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13 -8z" stroke="none"/></svg>
             <span id="play-label">Listen</span>
           </button>
         </div>
@@ -67,7 +74,8 @@
     <footer class="site-footer">
       <span>Built with Web Speech API · Vite · Tailwind CSS</span>
       <a href="https://github.com/AdamDruszad/text-to-speech-converter" target="_blank" rel="noopener noreferrer">
-        <i class="ti ti-brand-github mr-1"></i>Source on GitHub
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Source on GitHub
       </a>
     </footer>
   </div>

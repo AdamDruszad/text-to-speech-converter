@@ -62,15 +62,19 @@ voiceSelect.addEventListener("change", () => {
 
 // -- button state helpers --------------------------------------------------
 
+// SVG paths for the play/pause icon — avoids loading a whole icon font
+const PLAY_SVG = '<path d="M7 4v16l13 -8z" stroke="none"/>';
+const PAUSE_SVG = '<path d="M6 4h4v16h-4zM14 4h4v16h-4z" stroke="none"/>';
+
 function setPlayingState() {
   playBtn.classList.add("btn-playing");
-  playIcon.classList.replace("ti-player-play", "ti-player-pause");
+  playIcon.innerHTML = PAUSE_SVG;
   playLabel.textContent = "Playing\u2026";
 }
 
 function setIdleState() {
   playBtn.classList.remove("btn-playing");
-  playIcon.classList.replace("ti-player-pause", "ti-player-play");
+  playIcon.innerHTML = PLAY_SVG;
   playLabel.textContent = "Listen";
 }
 
