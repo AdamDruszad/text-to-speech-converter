@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700;800&display=swap');
 
 @theme {
   --color-sherpa-blue: #003d4d;
-  --color-caribbian-green: #00c996;
+  --color-caribbean-green: #00c996;
   --color-textarea: #55B58E;
   --color-button: #54c4a2;
   --color-select: #50B9BF;
@@ -13,6 +14,176 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: sans-serif;
+    font-family: 'Inter', sans-serif;
   }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+}
+
+@layer utilities {
+  .h-dvh {
+    height: 100dvh;
+  }
+}
+
+/* ── Glassmorphism panel ──────────────────────────────── */
+.tts-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border-radius: 1rem;
+}
+
+/* ── Heading accent word ──────────────────────────────── */
+.accent-word {
+  position: relative;
+  color: #34d399;
+}
+.accent-word::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #34d399, #06b6d4);
+}
+
+/* ── Primary CTA button ──────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ── Muted dropdown (recedes behind CTA) ──────────────── */
+.select-muted {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  font-weight: 400;
+  font-size: 0.875rem;
+  padding: 0 1.25rem;
+  padding-right: 2.5rem;
+  height: 48px;
+  border-radius: 0.75rem;
+  outline: none;
+  appearance: none;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.select-muted:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.select-muted:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+}
+
+/* ── Textarea ─────────────────────────────────────────── */
+.tts-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: white;
+  font-size: 0.9375rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tts-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+}
+.tts-textarea:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.3);
+}
+
+/* ── Playing state pulse animation ────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 4px 24px rgba(16, 185, 129, 0.7); }
+}
+.btn-playing {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* ── Header & Footer ──────────────────────────────────── */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+}
+.site-header .logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.site-header .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+.site-header .nav-link:hover {
+  color: white;
+}
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.site-footer a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.site-footer a:hover {
+  color: white;
 }

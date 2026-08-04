@@ -8,26 +8,26 @@ let startWatchdogId = null;
 // Explicit feature detection - ne omoljon össze csendben régi/egzotikus böngészőn
 if (!("speechSynthesis" in window)) {
   playBtn.disabled = true;
-  playBtn.title = "A böngésződ nem támogatja a beszédszintézist.";
-  console.error("Web Speech API nem elérhető ebben a böngészőben.");
+  playBtn.title = "Your browser does not support text-to-speech.";
+  console.error("The Web Speech API is not available in this browser.");
 }
 
 const speech = new SpeechSynthesisUtterance();
 let voices = [];
 
 function populateVoices() {
-  if (voices.length > 0) return; // már megvan a lista, ne futtassuk kétszer
+  if (voices.length > 0) return; // We already have the list, so let's not run it twice
   voices = synth.getVoices();
-  if (voices.length === 0) return; // Chrome-on ilyenkor még várni kell az eseményre
+  if (voices.length === 0) return; // In Chrome, you still have to wait for the event to start
 
-  voiceSelect.replaceChildren(); // biztos, ami biztos: nincs duplikáció
+  voiceSelect.replaceChildren(); // Just to be on the safe side: no duplication
   voices.forEach((voice, i) => {
     voiceSelect.add(new Option(`${voice.name} (${voice.lang})`, i));
   });
   speech.voice = voices[0];
 }
 
-populateVoices(); // Firefox-on ez már itt kitölti a listát
+populateVoices(); // In Firefox, this already populates the list here
 if ("onvoiceschanged" in synth) {
   synth.onvoiceschanged = populateVoices; // Chrome-nak ez kell
 }
@@ -65,7 +65,7 @@ speech.addEventListener("error", (e) => {
   clearTimeout(startWatchdogId);
 });
 
-function showError(message){
+function showError(message) {
   const card = document.getElementById('error-card');
   const overlay = document.getElementById('error-overlay');
   document.getElementById('error-text').textContent = message;
@@ -73,14 +73,16 @@ function showError(message){
   overlay.classList.remove('hidden');
 }
 
-function hideError(){
+function hideError() {
   document.getElementById('error-card').classList.add('hidden');
   document.getElementById('error-overlay').classList.add('hidden');
 }
 
+document.getElementById('close-error-btn').addEventListener('click', hideError);
+
 playBtn.addEventListener("click", () => {
   const text = textarea.value.trim();
-  if (!text){
+  if (!text) {
     showError("Nem írtál be szöveget!");
     return;
   } // üres szöveget sose küldjünk - Chrome-ban elronthatja a motort
@@ -90,7 +92,7 @@ playBtn.addEventListener("click", () => {
   synth.speak(speech);
   speechStarted = false;
   const timeLimit = setTimeout(() => {
-    if(!speechStarted){
+    if (!speechStarted) {
       synth.cancel();
       console.error("Hiba történt a lejátszással, próbáld újra!");
     }
