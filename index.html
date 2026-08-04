@@ -1,99 +1,78 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A free, browser-based text-to-speech converter. Type or paste any text, pick a voice, and listen instantly — no sign-up required." />
-    <link href="/src/style.css" rel="stylesheet" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
-    />
-    <title>Text To Speech Converter</title>
-  </head>
-  <body>
-    <!-- Error overlay -->
-    <div
-      id="error-overlay"
-      class="hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
-    ></div>
 
-    <div
-      id="error-card"
-      class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-50 px-4 py-3 text-red-800 shadow-lg"
-    >
-      <span id="error-text" class="text-sm"></span>
-      <button id="close-error-btn" class="text-red-500 hover:text-red-700 cursor-pointer">
-        ✕
-      </button>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/src/assets/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="A free, browser-based text-to-speech converter. Type or paste any text, pick a voice, and listen instantly — no sign-up required." />
+  <link href="/src/style.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <title>Text To Speech Converter</title>
+</head>
 
-    <!-- Page wrapper -->
-    <div
-      class="min-h-dvh flex flex-col bg-linear-25 from-sherpa-blue to-caribbean-green"
-    >
-      <!-- Header -->
-      <header class="site-header">
-        <a href="/" class="logo">
-          <i class="ti ti-volume text-lg"></i>
-          TTS Converter
-        </a>
-        <a
-          href="https://github.com/AdamDruszad"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="nav-link"
-        >
-          <i class="ti ti-brand-github mr-1"></i>Portfolio
-        </a>
-      </header>
+<body>
+  <!-- Error overlay -->
+  <div id="error-overlay" class="hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"></div>
 
-      <!-- Main content -->
-      <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
-        <div class="tts-panel w-full max-w-xl p-6 sm:p-8 flex flex-col items-center">
-          <h1
-            class="text-white text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight text-center"
-            style="font-family: 'Space Grotesk', sans-serif"
-          >
-            Text To Speech
-            <span class="accent-word">Converter</span>
-          </h1>
+  <div id="error-card"
+    class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-50 px-4 py-3 text-red-800 shadow-lg">
+    <span id="error-text" class="text-sm"></span>
+    <button id="close-error-btn" class="text-red-500 hover:text-red-700 cursor-pointer">
+      ✕
+    </button>
+  </div>
 
-          <textarea
-            id="tts-input"
-            placeholder="Write anything here..."
-            class="tts-textarea min-h-[150px] md:min-h-[250px] mb-6"
-          ></textarea>
+  <!-- Page wrapper -->
+  <div class="min-h-dvh flex flex-col bg-linear-25 from-sherpa-blue to-caribbean-green">
+    <!-- Header -->
+    <header class="site-header">
+      <a href="/" class="logo">
+        <i class="ti ti-volume text-lg"></i>
+        TTS Converter
+      </a>
+      <a href="https://github.com/AdamDruszad" target="_blank" rel="noopener noreferrer" class="nav-link">
+        <i class="ti ti-brand-github mr-1"></i>Portfolio
+      </a>
+    </header>
 
-          <div class="w-full flex flex-col sm:flex-row items-stretch gap-3">
-            <div class="flex-1 relative group">
-              <select id="voice-select" class="select-muted"></select>
-              <i
-                class="ti ti-caret-down absolute text-lg right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180"
-              ></i>
-            </div>
-            <button id="play-btn" class="btn-primary w-full sm:w-auto">
-              <i id="play-icon" class="ti ti-player-play text-lg"></i>
-              <span id="play-label">Listen</span>
-            </button>
+    <!-- Main content -->
+    <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
+      <div class="tts-panel w-full max-w-xl p-6 sm:p-8 flex flex-col items-center">
+        <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight text-center"
+          style="font-family: 'Space Grotesk', sans-serif">
+          Text To Speech
+          <span class="accent-word">Converter</span>
+        </h1>
+
+        <textarea id="tts-input" placeholder="Write anything here..."
+          class="tts-textarea min-h-[150px] md:min-h-[250px] mb-6"></textarea>
+
+        <div class="w-full flex flex-col sm:flex-row items-stretch gap-3">
+          <div class="flex-1 relative group">
+            <select id="voice-select" class="select-muted"></select>
+            <i
+              class="ti ti-caret-down absolute text-lg right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180"></i>
           </div>
+          <button id="play-btn" class="btn-primary w-full sm:w-auto">
+            <i id="play-icon" class="ti ti-player-play text-lg"></i>
+            <span id="play-label">Listen</span>
+          </button>
         </div>
-      </main>
+      </div>
+    </main>
 
-      <!-- Footer -->
-      <footer class="site-footer">
-        <span>Built with Web Speech API · Vite · Tailwind CSS</span>
-        <a
-          href="https://github.com/AdamDruszad/text-to-speech-converter"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <i class="ti ti-brand-github mr-1"></i>Source on GitHub
-        </a>
-      </footer>
-    </div>
+    <!-- Footer -->
+    <footer class="site-footer">
+      <span>Built with Web Speech API · Vite · Tailwind CSS</span>
+      <a href="https://github.com/AdamDruszad/text-to-speech-converter" target="_blank" rel="noopener noreferrer">
+        <i class="ti ti-brand-github mr-1"></i>Source on GitHub
+      </a>
+    </footer>
+  </div>
 
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
