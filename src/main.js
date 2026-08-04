@@ -1,39 +1,46 @@
 const synth = window.speechSynthesis;
-const playBtn = document.getElementById('play-btn');
-const textarea = document.querySelector("textarea");
-const voiceSelect = document.querySelector("select");
+const playBtn = document.getElementById("play-btn");
+const playIcon = document.getElementById("play-icon");
+const playLabel = document.getElementById("play-label");
+const textarea = document.getElementById("tts-input");
+const voiceSelect = document.getElementById("voice-select");
+
 let speechStarted = false;
 let startWatchdogId = null;
 
-// Explicit feature detection - ne omoljon össze csendben régi/egzotikus böngészőn
+// bail out early if the browser straight up doesn't have speech synthesis
 if (!("speechSynthesis" in window)) {
   playBtn.disabled = true;
   playBtn.title = "Your browser does not support text-to-speech.";
-  console.error("The Web Speech API is not available in this browser.");
 }
 
 const speech = new SpeechSynthesisUtterance();
 let voices = [];
 
 function populateVoices() {
-  if (voices.length > 0) return; // We already have the list, so let's not run it twice
-  voices = synth.getVoices();
-  if (voices.length === 0) return; // In Chrome, you still have to wait for the event to start
+  // already populated — don't run twice
+  if (voices.length > 0) return;
 
-  voiceSelect.replaceChildren(); // Just to be on the safe side: no duplication
+  voices = synth.getVoices();
+  if (voices.length === 0) return; // chrome fires this early with an empty list, so just wait
+
+  voiceSelect.replaceChildren();
   voices.forEach((voice, i) => {
     voiceSelect.add(new Option(`${voice.name} (${voice.lang})`, i));
   });
+
+  // pick the first voice as the default
   speech.voice = voices[0];
 }
 
-populateVoices(); // In Firefox, this already populates the list here
+// firefox has voices ready synchronously, chrome needs the event
+populateVoices();
 if ("onvoiceschanged" in synth) {
-  synth.onvoiceschanged = populateVoices; // Chrome-nak ez kell
+  synth.onvoiceschanged = populateVoices;
 }
 
-// Safari fallback: dokumentáltan előfordul, hogy a voiceschanged sosem tüzel el.
-// 200ms-enként próbálkozunk, max 2 másodpercig, aztán feladjuk.
+// safari sometimes never fires voiceschanged at all,
+// so we poll every 200ms for up to 2 seconds as a last resort
 let pollCount = 0;
 const pollId = setInterval(() => {
   pollCount++;
@@ -48,54 +55,122 @@ voiceSelect.addEventListener("change", () => {
   speech.voice = voices[Number(voiceSelect.value)];
 });
 
-// Chrome ~15 mp után elnémítja a hosszú szöveget - a resume() életben tartja.
+// -- button state helpers --------------------------------------------------
+
+function setPlayingState() {
+  playBtn.classList.add("btn-playing");
+  playIcon.classList.replace("ti-player-play", "ti-player-pause");
+  playLabel.textContent = "Playing\u2026";
+}
+
+function setIdleState() {
+  playBtn.classList.remove("btn-playing");
+  playIcon.classList.replace("ti-player-pause", "ti-player-play");
+  playLabel.textContent = "Listen";
+}
+
+// -- speech event handlers -------------------------------------------------
+
+// chrome kills audio after ~15s of continuous speech.
+// calling resume() on a timer keeps it alive.
 let keepAliveId = null;
+
 speech.addEventListener("start", () => {
   clearInterval(keepAliveId);
   keepAliveId = setInterval(() => {
     if (synth.speaking) synth.resume();
-  }, 10000);
+  }, 10_000);
   speechStarted = true;
   clearTimeout(startWatchdogId);
-});
-speech.addEventListener("end", () => clearInterval(keepAliveId));
-speech.addEventListener("error", (e) => {
-  clearInterval(keepAliveId);
-  console.error("Beszédszintézis hiba:", e.error);
-  clearTimeout(startWatchdogId);
+  setPlayingState();
 });
 
+speech.addEventListener("end", () => {
+  clearInterval(keepAliveId);
+  setIdleState();
+});
+
+speech.addEventListener("error", (e) => {
+  clearInterval(keepAliveId);
+  clearTimeout(startWatchdogId);
+  setIdleState();
+
+  // surface the actual error so it's never invisible
+  const code = e.error || "unknown";
+  console.error("TTS error:", code);
+
+  // "canceled" fires when we call synth.cancel() ourselves — not a real error
+  if (code !== "canceled") {
+    showError(`Speech failed: ${code}. Try picking a different voice.`);
+  }
+});
+
+// -- error modal -----------------------------------------------------------
+
 function showError(message) {
-  const card = document.getElementById('error-card');
-  const overlay = document.getElementById('error-overlay');
-  document.getElementById('error-text').textContent = message;
-  card.classList.remove('hidden');
-  overlay.classList.remove('hidden');
+  document.getElementById("error-text").textContent = message;
+  document.getElementById("error-card").classList.remove("hidden");
+  document.getElementById("error-overlay").classList.remove("hidden");
 }
 
 function hideError() {
-  document.getElementById('error-card').classList.add('hidden');
-  document.getElementById('error-overlay').classList.add('hidden');
+  document.getElementById("error-card").classList.add("hidden");
+  document.getElementById("error-overlay").classList.add("hidden");
 }
 
-document.getElementById('close-error-btn').addEventListener('click', hideError);
+document.getElementById("close-error-btn").addEventListener("click", hideError);
+
+// -- play button -----------------------------------------------------------
 
 playBtn.addEventListener("click", () => {
+  // if something is already playing, just stop it
+  if (synth.speaking) {
+    synth.cancel();
+    setIdleState();
+    return;
+  }
+
   const text = textarea.value.trim();
   if (!text) {
-    showError("Nem írtál be szöveget!");
+    showError("Please enter some text first!");
     return;
-  } // üres szöveget sose küldjünk - Chrome-ban elronthatja a motort
+  }
 
-  synth.cancel(); // különben minden kattintás sorba állna a régi mögé, nem felülírná
+  // re-read voices right before speaking — covers devices (like some Samsungs)
+  // where getVoices() returns nothing until the user actually interacts
+  if (voices.length === 0) {
+    voices = synth.getVoices();
+    if (voices.length > 0) {
+      voiceSelect.replaceChildren();
+      voices.forEach((voice, i) => {
+        voiceSelect.add(new Option(`${voice.name} (${voice.lang})`, i));
+      });
+      speech.voice = voices[0];
+    }
+  }
+
+  // make sure the voice we're about to use actually exists on this device
+  const selectedIdx = Number(voiceSelect.value);
+  const selectedVoice = voices[selectedIdx];
+  if (selectedVoice) {
+    speech.voice = selectedVoice;
+  } else if (voices.length > 0) {
+    // selected index is somehow invalid — fall back to the first available voice
+    speech.voice = voices[0];
+  }
+  // if voices is still empty we let the browser use its own default — better than silence
+
+  synth.cancel(); // clear any queued speech so the new one starts immediately
   speech.text = text;
   synth.speak(speech);
+
+  // watchdog: if nothing fires within 3 seconds, something went wrong
   speechStarted = false;
-  const timeLimit = setTimeout(() => {
+  startWatchdogId = setTimeout(() => {
     if (!speechStarted) {
       synth.cancel();
-      console.error("Hiba történt a lejátszással, próbáld újra!");
+      setIdleState();
+      showError("Playback didn\u2019t start \u2014 try a different voice or check your volume.");
     }
-  }, 3000)
-  startWatchdogId = timeLimit;
+  }, 3000);
 });
