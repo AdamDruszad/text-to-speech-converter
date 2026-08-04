@@ -8,6 +8,11 @@ const voiceSelect = document.getElementById("voice-select");
 let speechStarted = false;
 let startWatchdogId = null;
 
+// tracks how many voices we've tried in the current attempt,
+// so we can cycle through the list on failure instead of giving up
+let retryCount = 0;
+let pendingText = "";
+
 // bail out early if the browser straight up doesn't have speech synthesis
 if (!("speechSynthesis" in window)) {
   playBtn.disabled = true;
@@ -69,6 +74,25 @@ function setIdleState() {
   playLabel.textContent = "Listen";
 }
 
+// -- core speak function (used by both click handler and retry) -------------
+
+function speakWith(voice, text) {
+  synth.cancel();
+  speech.voice = voice;
+  speech.text = text;
+  synth.speak(speech);
+
+  speechStarted = false;
+  clearTimeout(startWatchdogId);
+  startWatchdogId = setTimeout(() => {
+    if (!speechStarted) {
+      synth.cancel();
+      setIdleState();
+      showError("Playback didn\u2019t start \u2014 try a different voice or check your volume.");
+    }
+  }, 3000);
+}
+
 // -- speech event handlers -------------------------------------------------
 
 // chrome kills audio after ~15s of continuous speech.
@@ -81,6 +105,7 @@ speech.addEventListener("start", () => {
     if (synth.speaking) synth.resume();
   }, 10_000);
   speechStarted = true;
+  retryCount = 0; // it worked — reset for next time
   clearTimeout(startWatchdogId);
   setPlayingState();
 });
@@ -93,16 +118,30 @@ speech.addEventListener("end", () => {
 speech.addEventListener("error", (e) => {
   clearInterval(keepAliveId);
   clearTimeout(startWatchdogId);
-  setIdleState();
 
-  // surface the actual error so it's never invisible
   const code = e.error || "unknown";
   console.error("TTS error:", code);
 
-  // "canceled" fires when we call synth.cancel() ourselves — not a real error
-  if (code !== "canceled") {
-    showError(`Speech failed: ${code}. Try picking a different voice.`);
+  // "canceled" fires when we call synth.cancel() ourselves — not a real problem
+  if (code === "canceled") return;
+
+  // the voice's TTS engine failed (common on Samsung where some voices
+  // are listed but their data isn't downloaded). try the next voice
+  // in the list automatically before bothering the user.
+  if (retryCount < voices.length - 1) {
+    retryCount++;
+    const currentIdx = Number(voiceSelect.value);
+    const nextIdx = (currentIdx + retryCount) % voices.length;
+
+    console.warn(`voice failed, auto-trying: ${voices[nextIdx].name}`);
+    voiceSelect.value = nextIdx;
+    speakWith(voices[nextIdx], pendingText);
+    return;
   }
+
+  // we've tried every voice and nothing works
+  setIdleState();
+  showError("None of the available voices worked. Check that a TTS engine is installed on your device (Settings \u2192 General \u2192 Text-to-speech).");
 });
 
 // -- error modal -----------------------------------------------------------
@@ -149,28 +188,18 @@ playBtn.addEventListener("click", () => {
     }
   }
 
+  if (voices.length === 0) {
+    showError("No voices available on this device. Check your TTS settings.");
+    return;
+  }
+
   // make sure the voice we're about to use actually exists on this device
   const selectedIdx = Number(voiceSelect.value);
-  const selectedVoice = voices[selectedIdx];
-  if (selectedVoice) {
-    speech.voice = selectedVoice;
-  } else if (voices.length > 0) {
-    // selected index is somehow invalid — fall back to the first available voice
-    speech.voice = voices[0];
-  }
-  // if voices is still empty we let the browser use its own default — better than silence
+  const voice = voices[selectedIdx] || voices[0];
 
-  synth.cancel(); // clear any queued speech so the new one starts immediately
-  speech.text = text;
-  synth.speak(speech);
+  // stash the text so the retry logic can re-use it
+  pendingText = text;
+  retryCount = 0;
 
-  // watchdog: if nothing fires within 3 seconds, something went wrong
-  speechStarted = false;
-  startWatchdogId = setTimeout(() => {
-    if (!speechStarted) {
-      synth.cancel();
-      setIdleState();
-      showError("Playback didn\u2019t start \u2014 try a different voice or check your volume.");
-    }
-  }, 3000);
+  speakWith(voice, text);
 });
