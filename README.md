@@ -1,91 +1,61 @@
-# 🗣️ Text-to-Speech Converter
+# Text to Speech Converter
 
-A clean, browser-based text-to-speech converter built with vanilla JavaScript and the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API). Type or paste any text, pick a voice, and hit **Listen**.
+A browser-based speech app built with vanilla JavaScript, the Web Speech API, Tailwind CSS and Vite. Enter text, choose an available voice and press **Listen**. Press **Stop** to cancel, including while a voice is still starting.
 
-![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+[Live demo](https://text-to-speech-converter-five-orpin.vercel.app/) · [Source](https://github.com/AdamDruszad/text-to-speech-converter)
 
-## ✨ Features
+## Features
 
-- **Real-time speech synthesis** — uses the browser's built-in `SpeechSynthesis` API
-- **Voice selector** — pick from all voices available on your system/browser
-- **Cross-browser support** — handles Chrome, Firefox, and Safari quirks (voice loading, long-text cutoff, etc.)
-- **Error handling** — user-friendly error overlay for empty input and playback failures
-- **Lightweight** — no backend, no external speech services, just your browser
+- Detect speech synthesis support before enabling playback.
+- Refresh asynchronously loaded voices and preserve the selected voice when the list changes.
+- Use a fresh utterance for each attempt and try each available voice at most once when startup fails with a retryable error.
+- Stop playback and pending retries without letting old speech events restart the session.
+- Report empty input, missing voices and playback failures in an accessible dialog.
+- Labelled controls, live playback status, keyboard focus styles and reduced-motion support.
+- A responsive writing workspace with a dark default, an optional light theme, and a saved appearance preference.
+- Adjustable reading speed and pitch, passed through to every speech attempt.
+- Example text, a clear action, live word/character counts, and an estimated reading time.
+- Inline SVG icons and Manrope / Instrument Serif typography via Google Fonts; no icon-font dependency.
 
-## 🛠️ Tech Stack
+## Run locally
 
-| Layer     | Technology                                                       |
-| --------- | ---------------------------------------------------------------- |
-| Bundler   | [Vite 8](https://vite.dev/)                                     |
-| Styling   | [Tailwind CSS 4](https://tailwindcss.com/)                      |
-| Icons     | [Tabler Icons](https://tabler.io/icons) (webfont)               |
-| Speech    | [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis) |
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) **18+**
-- npm (comes with Node.js)
-
-### Installation
+Use Node.js 24.15 or newer in the Node 24 release line and npm. `.nvmrc` selects Node 24; `package.json` lists all supported Node ranges.
 
 ```bash
-# Clone the repo
-git clone https://github.com/<your-username>/text-to-speech.git
-cd text-to-speech
-
-# Install dependencies
-npm install
-```
-
-### Development
-
-```bash
+git clone https://github.com/AdamDruszad/text-to-speech-converter.git
+cd text-to-speech-converter
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-### Production Build
+Open the address printed by Vite.
 
 ```bash
+npm test
 npm run build
-npm run preview   # preview the production build locally
+npm run preview
 ```
 
-The output is written to the `dist/` directory.
+Deploy the generated `dist/` directory. The app has no application backend.
 
-## 📁 Project Structure
+## Speech behavior and limitations
 
-```
-text-to-speech/
-├── public/
-│   ├── favicon.svg
-│   └── icons.svg
-├── src/
-│   ├── assets/
-│   ├── main.js          # Speech synthesis logic
-│   └── style.css         # Tailwind config & custom theme
-├── index.html            # App entry point
-├── vite.config.js        # Vite + Tailwind plugin
-├── package.json
-└── README.md
-```
+Available voices, languages and speech reliability depend on the browser and operating system. Some device-provided voices use network services, so offline availability is not guaranteed. This app does not choose or operate the browser's speech provider.
 
-## 🌐 Browser Support
+Reading time is a rough estimate based on 150 words per minute at normal speed. Voices can interpret speed and pitch differently. Voice settings and the editor are locked during playback; Stop makes them editable again. The theme is the only preference saved in local storage.
 
-| Browser | Status |
-| ------- | ------ |
-| Chrome  | ✅ Full support (includes long-text keep-alive workaround) |
-| Firefox | ✅ Full support |
-| Safari  | ✅ Supported (includes voice-loading fallback polling) |
-| Edge    | ✅ Full support (Chromium-based) |
+The chosen voice is tried first. A startup timeout or retryable startup error moves to the next voice; Stop cancels the whole session. An error after speech has started ends playback with a message instead of replaying the passage from the beginning. Startup retries may use a different language, so select a suitable voice for the text.
 
-> **Note:** Available voices depend on your operating system and browser. The number and quality of voices may vary.
+Automatic tests use a simulated speech engine. They do **not** establish full Chrome, Edge, Firefox or Safari compatibility or verify audible output. Before publishing, manually try a short passage, a long passage, late-loading voices and Stop during startup and playback in the browsers you intend to support. Browser and operating-system restrictions can still affect long passages.
 
-## 📄 License
+## Code and tests
 
-This project is licensed under the [MIT License](./LICENSE).
+- `src/speech-controller.js`: playback sessions, retries, timers and cancellation.
+- `src/main.js`: voice selection, form controls, status and error dialog.
+- `tests/speech.test.js`: deterministic speech-event and timer tests.
+- `tests/ui.test.js`: JSDOM checks for feature detection, voice refresh and controls.
+- `src/style.css`: responsive layout, contrast and interaction styles.
+
+## License
+
+[MIT](./LICENSE).
