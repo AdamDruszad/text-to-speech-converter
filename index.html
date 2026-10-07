@@ -1,86 +1,118 @@
 <!doctype html>
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="A free, browser-based text-to-speech converter. Type or paste any text, pick a voice, and listen instantly — no sign-up required." />
-
-  <!-- preconnect to Google Fonts so the browser starts the TLS handshake early -->
+  <meta name="theme-color" content="#191c18" />
+  <meta name="description" content="Give your words a voice. A thoughtful, free text-to-speech workspace with your device's voices and adjustable reading speed." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('tts-theme') === 'light' ? 'light' : 'dark'; } catch {}
+  </script>
   <link href="/src/style.css" rel="stylesheet" />
-  <title>Text To Speech Converter</title>
+  <title>Text to Speech — A little room for your words.</title>
 </head>
-
 <body>
+  <a class="skip-link" href="#tts-input">Skip to text editor</a>
   <dialog id="error-dialog" aria-labelledby="error-title" aria-describedby="error-text">
+    <span class="eyebrow">A quick heads-up</span>
     <h2 id="error-title">Playback unavailable</h2>
     <p id="error-text"></p>
-    <button id="close-error-btn" type="button" class="btn-primary">Close</button>
+    <button id="close-error-btn" type="button" class="btn-primary">Got it</button>
   </dialog>
 
-  <!-- Page wrapper -->
-  <div class="min-h-dvh flex flex-col bg-linear-25 from-sherpa-blue to-caribbean-green">
-    <!-- Header -->
+  <div class="page-shell">
     <header class="site-header">
-      <a href="/" class="logo">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.7 5a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        TTS Converter
+      <a href="/" class="logo" aria-label="Text to Speech home">
+        <span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>Text to Speech<span class="logo-period">.</span></span>
       </a>
-      <a href="https://portfolio-orpin-eight-240etcohnd.vercel.app/" target="_blank" rel="noopener noreferrer" class="nav-link">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Portfolio
-      </a>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode">
+          <svg class="icon theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="icon theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.6 13.7A9 9 0 0 1 10.3 3.4a9 9 0 1 0 10.3 10.3Z"/></svg>
+          <span id="theme-label">Light mode</span>
+        </button>
+        <a href="https://portfolio-orpin-eight-240etcohnd.vercel.app/" target="_blank" rel="noopener noreferrer" class="nav-link">By Ádám <span aria-hidden="true">↗</span></a>
+      </div>
     </header>
 
-    <!-- Main content -->
-    <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
-      <form id="tts-form" class="tts-panel w-full max-w-xl p-6 sm:p-8 flex flex-col items-center">
-        <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight text-center"
-          style="font-family: 'Space Grotesk', sans-serif">
-          Text To Speech
-          <span class="accent-word">Converter</span>
-        </h1>
-
-        <label for="tts-input" class="sr-only">Text to read aloud</label>
-        <textarea id="tts-input" placeholder="Write anything here..."
-          aria-describedby="voice-help"
-          class="tts-textarea min-h-[150px] md:min-h-[250px] mb-6"></textarea>
-
-        <div class="w-full flex flex-col sm:flex-row items-stretch gap-3">
-          <div class="flex-1 min-w-0 relative group">
-            <label for="voice-select" class="sr-only">Select voice</label>
-            <select id="voice-select" class="select-muted"></select>
-            <svg class="icon absolute right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6l6 -6"/></svg>
-          </div>
-          <button id="play-btn" type="submit" class="btn-primary w-full sm:w-auto" aria-label="Listen to text">
-            <svg id="play-icon" class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13 -8z" stroke="none"/></svg>
-            <span id="play-label">Listen</span>
-          </button>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow"><span class="section-index">01 /</span> THE LISTENING ROOM</p>
+          <h1 id="page-title">Your words.<br class="mobile-break" /> <em>A little more alive.</em></h1>
+          <p class="intro-description">An article, a thought, a story. Make space to listen.</p>
         </div>
-        <p id="playback-status" class="playback-status" role="status" aria-live="polite" aria-atomic="true"></p>
-        <p id="voice-help" class="voice-help">Available voices depend on your browser and device. Some voices need an internet connection.</p>
-        <noscript><p class="voice-help">Please enable JavaScript to use text-to-speech.</p></noscript>
+        <p class="intro-note"><span class="status-dot" aria-hidden="true"></span> No account. Just press play.</p>
+      </section>
+
+      <form id="tts-form" class="workspace" data-playback="idle">
+        <section class="writing-pane" aria-labelledby="editor-heading">
+          <div class="pane-heading">
+            <h2 id="editor-heading"><span class="section-index">01</span> The words</h2>
+            <div class="editor-actions">
+              <button id="sample-btn" class="text-button" type="button">Try an example <span aria-hidden="true">↗</span></button>
+              <span class="action-divider" aria-hidden="true"></span>
+              <button id="clear-btn" class="text-button" type="button" disabled>Clear</button>
+            </div>
+          </div>
+          <label for="tts-input" class="sr-only">Text to read aloud</label>
+          <textarea id="tts-input" class="tts-textarea" placeholder="Every good idea starts with a few words.&#10;Write or paste yours here…" aria-describedby="text-hint" spellcheck="true"></textarea>
+          <div class="editor-footer">
+            <p id="text-hint">A quiet place for your text.</p>
+            <div class="text-stats"><span id="word-count">0 words</span><span aria-hidden="true">/</span><span id="char-count">0 characters</span></div>
+          </div>
+        </section>
+
+        <section class="voice-pane" aria-labelledby="voice-heading">
+          <div class="pane-heading"><h2 id="voice-heading"><span class="section-index">02</span> The voice</h2><span class="voice-count" id="voice-count">Loading…</span></div>
+          <div class="voice-settings">
+            <label for="voice-select" class="field-label">Choose a voice</label>
+            <div class="select-wrap">
+              <select id="voice-select" aria-describedby="voice-help"><option>Loading voices…</option></select>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <p id="voice-help" class="voice-help">Voices come from your browser and device. Some need an internet connection.</p>
+            <div class="settings-controls">
+            <div class="range-field">
+              <div class="field-row"><label for="rate-input" class="field-label">Reading speed</label><output id="rate-value" for="rate-input">1×</output></div>
+              <input id="rate-input" type="range" min="0.5" max="2" step="0.1" value="1" />
+              <div class="range-labels" aria-hidden="true"><span>Slower</span><span>Faster</span></div>
+            </div>
+            <div class="range-field pitch-field">
+              <div class="field-row"><label for="pitch-input" class="field-label">Pitch</label><output id="pitch-value" for="pitch-input">1</output></div>
+              <input id="pitch-input" type="range" min="0.5" max="1.5" step="0.1" value="1" />
+              <div class="range-labels" aria-hidden="true"><span>Lower</span><span>Higher</span></div>
+            </div>
+            </div>
+            <button id="reset-settings-btn" class="text-button reset-settings" type="button">Reset voice settings <span aria-hidden="true">↺</span></button>
+          </div>
+          <div class="playback-area">
+            <div class="playback-top"><span class="eyebrow" id="playback-caption">READY WHEN YOU ARE</span><span class="read-time" id="read-time">~0:00</span></div>
+            <div class="waveform" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <button id="play-btn" type="submit" class="btn-primary play-button" aria-label="Listen to text">
+              <svg id="play-icon" class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+              <span id="play-label">Listen</span><span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+            <p id="playback-status" class="playback-status" role="status" aria-live="polite" aria-atomic="true">Loading available voices…</p>
+          </div>
+        </section>
       </form>
+      <div class="workspace-note"><p><span aria-hidden="true">↳</span> Read with your ears. Give your eyes a break.</p><p>Estimated reading time varies by voice.</p></div>
+      <noscript><p class="noscript-message">Please enable JavaScript to use text-to-speech.</p></noscript>
     </main>
 
-    <!-- Footer -->
     <footer class="site-footer">
-      <span>Built with Web Speech API · Vite · Tailwind CSS</span>
-      <a href="https://github.com/AdamDruszad/text-to-speech-converter" target="_blank" rel="noopener noreferrer">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Source on GitHub
-      </a>
+      <p>A small tool. <em>A different perspective.</em></p>
+      <a href="https://github.com/AdamDruszad/text-to-speech-converter" target="_blank" rel="noopener noreferrer">View the source <span aria-hidden="true">↗</span></a>
     </footer>
   </div>
-
   <script type="module" src="/src/main.js"></script>
 </body>
-
 </html>

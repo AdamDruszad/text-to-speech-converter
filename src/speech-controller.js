@@ -57,6 +57,8 @@ export function createSpeechController({
     }
     utterance.voice = voice;
     if (voice.lang) utterance.lang = voice.lang;
+    utterance.rate = run.rate;
+    utterance.pitch = run.pitch;
     const attempt = { utterance, started: false, watchdog: null, keepAlive: null };
     run.current = attempt;
     const isCurrent = () => session === run && run.current === attempt;
@@ -101,13 +103,19 @@ export function createSpeechController({
     }
   }
 
-  function play(text, voices, selectedIndex = 0) {
+  function play(text, voices, selectedIndex = 0, settings = {}) {
     stop();
     const cleanText = String(text).trim();
     if (!cleanText) { onError("Please enter some text first."); return; }
     if (!voices.length) { onError("No voices are available on this device. Check your speech settings and try again."); return; }
     const start = Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < voices.length ? selectedIndex : 0;
-    const run = { text: cleanText, voices: [...voices.slice(start), ...voices.slice(0, start)], index: 0, current: null };
+    const rate = Number(settings.rate);
+    const pitch = Number(settings.pitch);
+    const run = {
+      text: cleanText, voices: [...voices.slice(start), ...voices.slice(0, start)], index: 0, current: null,
+      rate: Number.isFinite(rate) ? Math.min(2, Math.max(0.5, rate)) : 1,
+      pitch: Number.isFinite(pitch) ? Math.min(1.5, Math.max(0.5, pitch)) : 1,
+    };
     session = run;
     nextAttempt(run);
   }

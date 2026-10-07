@@ -137,3 +137,14 @@ test("empty text and empty voice lists do not call the speech engine", () => {
   assert.equal(x.errors.length, 2);
   assert.equal(x.timers.pending, 0);
 });
+
+test("reading speed and pitch stay consistent when a voice falls back", () => {
+  const x = setup();
+  x.controller.play("Hello", x.voices, 0, { rate: 1.4, pitch: 0.8 });
+  assert.equal(x.spoken[0].rate, 1.4);
+  assert.equal(x.spoken[0].pitch, 0.8);
+  x.spoken[0].emit("error", "voice-unavailable");
+  assert.equal(x.spoken[1].rate, 1.4);
+  assert.equal(x.spoken[1].pitch, 0.8);
+  x.controller.stop();
+});

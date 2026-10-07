@@ -12,7 +12,10 @@ A browser-based speech app built with vanilla JavaScript, the Web Speech API, Ta
 - Stop playback and pending retries without letting old speech events restart the session.
 - Report empty input, missing voices and playback failures in an accessible dialog.
 - Labelled controls, live playback status, keyboard focus styles and reduced-motion support.
-- Inline SVG icons and locally bundled fonts; no icon-font dependency.
+- A responsive writing workspace with a dark default, an optional light theme, and a saved appearance preference.
+- Adjustable reading speed and pitch, passed through to every speech attempt.
+- Example text, a clear action, live word/character counts, and an estimated reading time.
+- Inline SVG icons and Manrope / Instrument Serif typography via Google Fonts; no icon-font dependency.
 
 ## Run locally
 
@@ -38,6 +41,8 @@ Deploy the generated `dist/` directory. The app has no application backend.
 ## Speech behavior and limitations
 
 Available voices, languages and speech reliability depend on the browser and operating system. Some device-provided voices use network services, so offline availability is not guaranteed. This app does not choose or operate the browser's speech provider.
+
+Reading time is a rough estimate based on 150 words per minute at normal speed. Voices can interpret speed and pitch differently. Voice settings and the editor are locked during playback; Stop makes them editable again. The theme is the only preference saved in local storage.
 
 The chosen voice is tried first. A startup timeout or retryable startup error moves to the next voice; Stop cancels the whole session. An error after speech has started ends playback with a message instead of replaying the passage from the beginning. Startup retries may use a different language, so select a suitable voice for the text.
 
