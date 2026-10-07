@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/src/assets/logo.png" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
     content="A free, browser-based text-to-speech converter. Type or paste any text, pick a voice, and listen instantly — no sign-up required." />
@@ -19,16 +19,11 @@
 </head>
 
 <body>
-  <!-- Error overlay -->
-  <div id="error-overlay" class="hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"></div>
-
-  <div id="error-card"
-    class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-50 px-4 py-3 text-red-800 shadow-lg">
-    <span id="error-text" class="text-sm"></span>
-    <button id="close-error-btn" class="text-red-500 hover:text-red-700 cursor-pointer" aria-label="Close error">
-      ✕
-    </button>
-  </div>
+  <dialog id="error-dialog" aria-labelledby="error-title" aria-describedby="error-text">
+    <h2 id="error-title">Playback unavailable</h2>
+    <p id="error-text"></p>
+    <button id="close-error-btn" type="button" class="btn-primary">Close</button>
+  </dialog>
 
   <!-- Page wrapper -->
   <div class="min-h-dvh flex flex-col bg-linear-25 from-sherpa-blue to-caribbean-green">
@@ -38,7 +33,7 @@
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.7 5a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         TTS Converter
       </a>
-      <a href="https://github.com/AdamDruszad" target="_blank" rel="noopener noreferrer" class="nav-link">
+      <a href="https://portfolio-orpin-eight-240etcohnd.vercel.app/" target="_blank" rel="noopener noreferrer" class="nav-link">
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Portfolio
       </a>
@@ -46,28 +41,33 @@
 
     <!-- Main content -->
     <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
-      <div class="tts-panel w-full max-w-xl p-6 sm:p-8 flex flex-col items-center">
+      <form id="tts-form" class="tts-panel w-full max-w-xl p-6 sm:p-8 flex flex-col items-center">
         <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight text-center"
           style="font-family: 'Space Grotesk', sans-serif">
           Text To Speech
           <span class="accent-word">Converter</span>
         </h1>
 
+        <label for="tts-input" class="sr-only">Text to read aloud</label>
         <textarea id="tts-input" placeholder="Write anything here..."
+          aria-describedby="voice-help"
           class="tts-textarea min-h-[150px] md:min-h-[250px] mb-6"></textarea>
 
         <div class="w-full flex flex-col sm:flex-row items-stretch gap-3">
-          <div class="flex-1 relative group">
+          <div class="flex-1 min-w-0 relative group">
             <label for="voice-select" class="sr-only">Select voice</label>
             <select id="voice-select" class="select-muted"></select>
             <svg class="icon absolute right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none transition-transform duration-150 group-has-[select:open]:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6l6 -6"/></svg>
           </div>
-          <button id="play-btn" class="btn-primary w-full sm:w-auto">
+          <button id="play-btn" type="submit" class="btn-primary w-full sm:w-auto" aria-label="Listen to text">
             <svg id="play-icon" class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13 -8z" stroke="none"/></svg>
             <span id="play-label">Listen</span>
           </button>
         </div>
-      </div>
+        <p id="playback-status" class="playback-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        <p id="voice-help" class="voice-help">Available voices depend on your browser and device. Some voices need an internet connection.</p>
+        <noscript><p class="voice-help">Please enable JavaScript to use text-to-speech.</p></noscript>
+      </form>
     </main>
 
     <!-- Footer -->

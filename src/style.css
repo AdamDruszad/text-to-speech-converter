@@ -56,7 +56,7 @@
 
 /* ── Glassmorphism panel ──────────────────────────────── */
 .tts-panel {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 36, 46, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -83,7 +83,7 @@
 /* ── Primary CTA button ──────────────────────────────── */
 .btn-primary {
   background: linear-gradient(135deg, #10b981, #06b6d4);
-  color: white;
+  color: #052e2b;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
@@ -140,12 +140,12 @@
   font-size: 0.9375rem;
   padding: 1.25rem;
   border-radius: 0.75rem;
-  resize: none;
+  resize: vertical;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .tts-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9375rem;
 }
 .tts-textarea:focus {
@@ -164,6 +164,7 @@
 
 /* ── Header & Footer ──────────────────────────────────── */
 .site-header {
+  background: rgba(0, 36, 46, 0.75);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -191,12 +192,13 @@
 }
 
 .site-footer {
+  background: rgba(0, 36, 46, 0.75);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
   flex-wrap: wrap;
   gap: 0.5rem;
 }
@@ -207,4 +209,22 @@
 }
 .site-footer a:hover {
   color: white;
+}
+
+.playback-status { width: 100%; min-height: 3rem; margin-top: 1.25rem; font-size: 0.875rem; color: white; }
+.voice-help { width: 100%; font-size: 0.8125rem; line-height: 1.5; color: #e2f6ee; }
+.select-muted option { background: #06464d; color: white; }
+.select-muted { min-width: 0; text-overflow: ellipsis; }
+.tts-textarea { max-height: 65vh; }
+button:focus-visible, a:focus-visible { outline: 3px solid #fef08a; outline-offset: 4px; }
+button:disabled, select:disabled { opacity: 0.65; cursor: not-allowed; }
+.btn-primary:disabled:hover { transform: none; }
+#error-dialog { margin: auto; padding: 1.5rem; width: min(28rem, calc(100% - 2rem)); border: 1px solid #fca5a5; border-radius: 1rem; color: #7f1d1d; background: #fff1f2; }
+#error-dialog::backdrop { background: rgb(0 0 0 / 0.55); }
+#error-dialog h2 { font-weight: 700; margin-bottom: 0.75rem; font-size: 1.2rem; }
+#error-dialog p { margin-bottom: 1rem; line-height: 1.5; }
+#error-dialog button:focus-visible { outline-color: #0f766e; }
+.site-header { flex-wrap: wrap; gap: 1rem; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
