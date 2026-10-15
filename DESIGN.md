@@ -4,13 +4,14 @@ The page is a working tool, and its visual world is a radio studio. A voice read
 
 ## Signature: the cue lamp
 
-`#playback-caption` (`.lamp`) sits beside the running time, directly above Listen/Stop. Its text is the existing playback caption, and its colour follows `form[data-playback]`:
+`#playback-caption` (`.lamp`) sits beside the running time, directly above Listen/Stop. Its text is the existing playback caption, and its colour follows `form[data-playback]`. Its shape is a pill with a 10px bulb, never the 6px-radius rectangle the buttons use, so it never reads as a control. The caption stays on one line (it may wrap only below 380px).
+
 
 | State | Look |
 |-------|------|
-| `idle` (ready, stopped, finished, unsupported) | Unlit: `--lamp-off` plate, `--lamp-off-ink` text, 1px inner edge |
+| `idle` (ready, stopped, finished, unsupported) | Unlit: dark `--lamp-off` lens, `--lamp-bulb` bulb, `--lamp-off-ink` text, 1px inner edge |
 | `starting` | `--standby` amber, pulsing to `--standby-dim` (900ms alternate) |
-| `speaking` | `--live` red, white text, light cast below it |
+| `speaking` | `--live` red, white bulb and text; a 700ms over-bright flash as it lights, then light cast below it |
 
 The rule is one colour per state. Red and amber appear nowhere else on the page. Lamp colours change over 450ms with `--ease-out`. Under `prefers-reduced-motion`, every animation and transition is off.
 
@@ -28,11 +29,11 @@ Light and dark themes are set by `html[data-theme]`, which an inline head script
 | `--line` / `--line-strong` | `#243049` / `#3a4766` | `#d3d9e4` / `#b5bfd0` | Hairlines, panel border |
 | `--accent-text` | `#9db4f0` | `#26407f` | Second headline line, wordmark dot |
 | `--focus` | `#8fb0ff` | `#2348b8` | Focus ring (white inside the console) |
-| `--console` | `#24366a` | `#1f2d55` | Voice settings and transport panel |
-| `--console-deep` | `#1b2a55` | `#172347` | Select field |
+| `--console` | `#24366a` | same | Voice settings and transport panel |
+| `--console-deep` | `#1b2a55` | same | Select field |
 | `--console-ink` / `--console-muted` | `#f2f5fb` / `#b9c4de` | same | Text on the console (≥ 6.6:1) |
 | `--track` | `#7486b4` | same | Empty slider track (≥ 3.2:1) |
-| `--lamp-off`, `--standby`, `--live` | `#16224a`, `#f4a93b`, `#d02b22` | `#152042`, same, same | Cue lamp only |
+| `--lamp-off`, `--lamp-bulb`, `--standby`, `--live` | `#16224a`, `#3b4a76`, `#f4a93b`, `#d02b22` | same | Cue lamp only |
 
 ## Type
 
@@ -49,16 +50,16 @@ One family: **Archivo** (variable, weight 100–900, width 62–125%), self-host
 | `--text-body` | 1rem | Select, base |
 | `--text-small` | 0.9375rem | Help, meta, status. **The floor: nothing smaller.** |
 
-Lamp and dialog plate text: `--text-small`, weight 720, width 72%, tracking 0.09em, uppercase.
+Lamp text: `--text-small`, weight 720, width 72%, tracking 0.04em, uppercase. Condensed caps belong to the lamp alone.
 
 ## Space, shape, layout
 
 - Spacing: `--space-1` to `--space-12` on a 4px base. `--gutter` is `clamp(1rem, 4vw, 4rem)` and `--pane-pad` is `clamp(1rem, 2.2vw, 1.75rem)`.
-- Radii: `--radius-field` 6px (fields, buttons, lamp) and `--radius-panel` 12px (workspace, dialog). The theme toggle is a pill.
+- Radii: `--radius-field` 6px (fields, buttons) and `--radius-panel` 12px (workspace, dialog). The lamp and the theme toggle are pills.
 - Workspace: a grid that clips its corners with `overflow: clip`, not `hidden`, so sticky positioning still works.
   - 760px and up: editor on the left, spanning two rows; console top-right; transport bottom-right, at a width of `clamp(19.5rem, 30vw, 25rem)`.
-  - Below 760px: one column, and `.transport` is `position: sticky; bottom: 0`. It holds the lamp, the time and Listen/Stop in one row, with the status line under them.
-  - Below 380px: the logo square is hidden and the transport stacks into two rows.
+  - Below 760px: one column, and `.transport` is `position: sticky; bottom: 0`. The lamp and time share a row, with the full-width Listen/Stop and then the status line under them.
+  - Below 380px: the logo square is hidden.
 - The intro sits side by side from 960px: the headline on the left, the supporting text in a column up to 25rem wide on the right.
 
 ## Components
