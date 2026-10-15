@@ -342,6 +342,7 @@
     font-size: var(--text-small);
     font-weight: 600;
     color: var(--muted);
+    white-space: nowrap;
     text-decoration: underline 1px transparent;
     text-underline-offset: 4px;
     transition: color 160ms ease, text-decoration-color 160ms ease;
@@ -972,17 +973,48 @@
     }
   }
 
+  /* Smallest phones (320–379px): the decorative logo square goes, the
+     wordmark stays; the transport stacks into two compact rows. */
   @media (max-width: 379px) {
+    .site-header {
+      flex-wrap: wrap;
+      column-gap: var(--space-2);
+    }
+
+    .brand-mark {
+      display: none;
+    }
+
     .brand-name {
       font-size: 1.0625rem;
     }
 
+    .header-actions {
+      gap: 0;
+      margin-left: auto;
+    }
+
+    .header-link {
+      padding-inline: var(--space-2) 0;
+    }
+
+    .pane-head {
+      flex-wrap: wrap;
+      row-gap: 0;
+    }
+
     .transport {
       grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+
+    .lamp {
+      min-height: 40px;
     }
 
     .play-btn {
       width: 100%;
+      min-height: 48px;
     }
   }
 }
