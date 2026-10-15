@@ -9,7 +9,6 @@ export function initTtsApp(doc = document, options = {}) {
   const timers = options.timers ?? win;
   const form = doc.getElementById("tts-form");
   const playBtn = doc.getElementById("play-btn");
-  const playIcon = doc.getElementById("play-icon");
   const playLabel = doc.getElementById("play-label");
   const textarea = doc.getElementById("tts-input");
   const voiceSelect = doc.getElementById("voice-select");
@@ -24,8 +23,7 @@ export function initTtsApp(doc = document, options = {}) {
   const resetButton = doc.getElementById("reset-settings-btn");
   const readTime = doc.getElementById("read-time");
   const caption = doc.getElementById("playback-caption");
-  const PLAY_SVG = '<path d="M7 4v16l13 -8z" stroke="none"/>';
-  const STOP_SVG = '<path d="M5 5h14v14H5z" stroke="none"/>';
+  const THEME_COLORS = { dark: "#0b1020", light: "#e7ebf2" };
   let voices = [];
   let pollId = null;
   let returnFocus = null;
@@ -37,15 +35,21 @@ export function initTtsApp(doc = document, options = {}) {
     themeToggle.setAttribute("aria-label", `Switch to ${action} mode`);
     themeToggle.title = `Switch to ${action} mode`;
     doc.getElementById("theme-label").textContent = `${action === "light" ? "Light" : "Dark"} mode`;
-    doc.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#191c18" : "#f5f4ef";
+    doc.querySelector('meta[name="theme-color"]').content = THEME_COLORS[theme];
   }
   function toggleTheme() {
     const theme = doc.documentElement.dataset.theme === "dark" ? "light" : "dark";
     setTheme(theme);
     try { win.localStorage.setItem("tts-theme", theme); } catch { /* Themes also work when storage is unavailable. */ }
   }
-  try { setTheme(win.localStorage.getItem("tts-theme") === "light" ? "light" : "dark"); }
-  catch { setTheme("dark"); }
+  // A saved choice wins; otherwise follow the system setting, falling back to dark.
+  function initialTheme() {
+    let saved = null;
+    try { saved = win.localStorage.getItem("tts-theme"); } catch { /* Storage can be blocked. */ }
+    if (saved === "light" || saved === "dark") return saved;
+    return win.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  setTheme(initialTheme());
   themeToggle.addEventListener("click", toggleTheme);
 
   function updateTextStats() {
@@ -61,7 +65,14 @@ export function initTtsApp(doc = document, options = {}) {
     // An example never replaces text the user is already working on.
     sampleButton.disabled = Boolean(textarea.value) || Boolean(controller?.active);
   }
+  // Position of the thumb (0–1) for the filled part of the slider track.
+  function setFill(input) {
+    const min = Number(input.min), max = Number(input.max);
+    input.style.setProperty("--pct", String((Number(input.value) - min) / (max - min)));
+  }
   function updateSettings() {
+    setFill(rateInput);
+    setFill(pitchInput);
     doc.getElementById("rate-value").textContent = `${Number(rateInput.value)}×`;
     doc.getElementById("pitch-value").textContent = Number(pitchInput.value).toString();
     rateInput.setAttribute("aria-valuetext", `${Number(rateInput.value)} times normal speed`);
@@ -144,9 +155,8 @@ export function initTtsApp(doc = document, options = {}) {
       : state.status === "speaking" ? "A MOMENT TO LISTEN"
       : state.completed ? "THAT'S A WRAP" : "READY WHEN YOU ARE";
     updateTextStats();
-    playBtn.classList.toggle("btn-playing", state.status === "speaking");
+    // The play/stop icons follow form[data-playback] in CSS.
     playBtn.setAttribute("aria-label", busy ? "Stop playback" : "Listen to text");
-    playIcon.innerHTML = busy ? STOP_SVG : PLAY_SVG;
     playLabel.textContent = busy ? "Stop" : "Listen";
     voiceSelect.disabled = busy || voices.length === 0;
     status.textContent = state.status === "starting"
