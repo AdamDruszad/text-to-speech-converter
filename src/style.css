@@ -69,6 +69,7 @@
   --lamp-off: #16224a;
   --lamp-off-ink: #a9b6d6;
   --lamp-off-edge: #33446f;
+  --lamp-bulb: #3b4a76;
   --standby: #f4a93b;
   --standby-dim: #d88f24;
   --standby-ink: #2a1a00;
@@ -91,10 +92,8 @@
   --solid: #131a2c;
   --solid-ink: #ffffff;
   --shadow: rgb(19 26 44 / 0.28);
-  --console: #1f2d55;
-  --console-deep: #172347;
-  --console-line: #34446f;
-  --lamp-off: #152042;
+  /* Console and lamp tokens are deliberately not overridden: the studio-blue
+     panel is the same in both themes. */
 }
 
 /* ==========================================================================
@@ -610,30 +609,44 @@
   }
 
   /* Signature: the studio cue lamp. Unlit when idle, amber while a voice is
-     starting, lit red while speaking. Text comes from the playback caption. */
+     starting, lit red while speaking. Text comes from the playback caption.
+     A pill with a bulb, never the rectangle the buttons use, so it never
+     reads as a second control. */
   .lamp {
     display: flex;
     flex: 1;
     align-items: center;
-    justify-content: center;
+    gap: var(--space-3);
     min-width: 0;
-    min-height: 48px;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-field);
+    min-height: 40px;
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+    border-radius: 999px;
     background: var(--lamp-off);
     color: var(--lamp-off-ink);
     box-shadow: inset 0 0 0 1px var(--lamp-off-edge);
     font-size: var(--text-small);
     font-weight: 720;
     font-stretch: 72%;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.04em;
     line-height: 1.15;
-    text-align: center;
+    white-space: nowrap;
     text-transform: uppercase;
     transition:
       background-color 450ms var(--ease-out),
       color 450ms var(--ease-out),
       box-shadow 450ms var(--ease-out);
+  }
+
+  /* The bulb: dark glass when unlit. */
+  .lamp::before {
+    content: "";
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--lamp-bulb);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.5);
+    transition: background-color 450ms var(--ease-out);
   }
 
   [data-playback="starting"] .lamp {
@@ -643,12 +656,23 @@
     animation: lamp-standby 900ms ease-in-out infinite alternate;
   }
 
+  [data-playback="starting"] .lamp::before {
+    background: var(--standby-ink);
+    box-shadow: none;
+  }
+
   [data-playback="speaking"] .lamp {
     background: var(--live);
     color: var(--live-ink);
     box-shadow:
       inset 0 0 0 1px rgb(255 255 255 / 0.28),
       0 10px 28px -12px rgb(208 43 34 / 0.9);
+    animation: lamp-on 700ms var(--ease-out);
+  }
+
+  [data-playback="speaking"] .lamp::before {
+    background: var(--live-ink);
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 0.25);
   }
 
   .read-time {
@@ -782,15 +806,10 @@
     background: rgb(6 9 20 / 0.62);
   }
 
-  .dialog-plate {
-    padding: var(--space-3) var(--space-6);
-    background: var(--console);
-    color: var(--console-ink);
+  .dialog-lead {
     font-size: var(--text-small);
-    font-weight: 720;
-    font-stretch: 72%;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
   }
 
   .dialog-body {
@@ -941,12 +960,13 @@
       padding-inline: var(--space-2);
     }
 
+    /* Lamp and time on one row, the button full width under them, so the
+       longest caption never wraps. */
     .transport {
       position: sticky;
       bottom: 0;
       z-index: 5;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--space-2) var(--space-3);
+      gap: var(--space-2);
       padding-block: var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom));
       box-shadow: 0 -14px 28px -18px var(--shadow);
     }
@@ -961,20 +981,16 @@
     }
 
     .play-btn {
-      width: auto;
-      min-width: 7.75rem;
       min-height: 52px;
-      padding-inline: var(--space-5);
     }
 
     .playback-status {
-      grid-column: 1 / -1;
       min-height: 0;
     }
   }
 
   /* Smallest phones (320–379px): the decorative logo square goes, the
-     wordmark stays; the transport stacks into two compact rows. */
+     wordmark stays; the lamp may wrap as a last resort. */
   @media (max-width: 379px) {
     .site-header {
       flex-wrap: wrap;
@@ -1003,17 +1019,11 @@
       row-gap: 0;
     }
 
-    .transport {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-2);
-    }
-
     .lamp {
-      min-height: 40px;
+      white-space: normal;
     }
 
     .play-btn {
-      width: 100%;
       min-height: 48px;
     }
   }
@@ -1022,6 +1032,13 @@
 @keyframes lamp-standby {
   to {
     background-color: var(--standby-dim);
+  }
+}
+
+/* The moment the lamp lights: a short over-bright flash that settles. */
+@keyframes lamp-on {
+  from {
+    filter: brightness(1.45);
   }
 }
 
