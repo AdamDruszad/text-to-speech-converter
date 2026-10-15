@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://text-to-speech-converter-five-orpin.vercel.app/sitemap.xml
