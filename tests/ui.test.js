@@ -81,6 +81,28 @@ test("theme preference persists through app initialization and works without spe
   dom.window.close();
 });
 
+test("without a saved choice the theme follows the system setting", (t) => {
+  for (const [systemLight, expected] of [[true, "light"], [false, "dark"]]) {
+    const dom = new JSDOM(html, { url: "https://speech.test/" });
+    dom.window.matchMedia = (query) => ({ matches: query === "(prefers-color-scheme: light)" && systemLight });
+    const app = initTtsApp(dom.window.document, { synth: {} });
+    t.after(() => { app.dispose(); dom.window.close(); });
+    assert.equal(dom.window.document.documentElement.dataset.theme, expected);
+    assert.equal(dom.window.document.querySelector('meta[name="theme-color"]').content, expected === "light" ? "#e7ebf2" : "#0b1020");
+  }
+});
+
+test("sliders expose their position for the filled track", (t) => {
+  const x = setup(t, true, [a]);
+  const rate = x.doc.getElementById("rate-input");
+  assert.equal(rate.style.getPropertyValue("--pct"), String(1 / 3));
+  rate.value = "2";
+  rate.dispatchEvent(new x.dom.window.Event("input"));
+  assert.equal(rate.style.getPropertyValue("--pct"), "1");
+  x.doc.getElementById("reset-settings-btn").click();
+  assert.equal(x.doc.getElementById("pitch-input").style.getPropertyValue("--pct"), "0.5");
+});
+
 test("example and clear update text stats without replacing the user's existing text", (t) => {
   const x = setup(t, true, [a]);
   const input = x.doc.getElementById("tts-input");
