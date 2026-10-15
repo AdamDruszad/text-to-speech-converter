@@ -666,7 +666,7 @@
     color: var(--live-ink);
     box-shadow:
       inset 0 0 0 1px rgb(255 255 255 / 0.28),
-      0 10px 28px -12px rgb(208 43 34 / 0.9);
+      0 4px 14px -6px rgb(208 43 34 / 0.85);
     animation: lamp-on 700ms var(--ease-out);
   }
 
@@ -806,11 +806,6 @@
     background: rgb(6 9 20 / 0.62);
   }
 
-  .dialog-lead {
-    font-size: var(--text-small);
-    font-weight: 600;
-    color: var(--muted);
-  }
 
   .dialog-body {
     display: grid;
@@ -826,10 +821,16 @@
     line-height: 1.2;
   }
 
-  #error-text {
+  .dialog-message {
     font-size: var(--text-ui);
     line-height: 1.55;
     color: var(--muted);
+  }
+
+  /* Run-in lead, the same treatment as "The listening room." in the intro. */
+  .dialog-lead {
+    font-weight: 700;
+    color: var(--ink);
   }
 
   .btn-solid {
@@ -980,12 +981,26 @@
       font-size: 1.25rem;
     }
 
+    .lamp {
+      min-height: 36px;
+    }
+
+    /* No cast light where the button sits right under the lamp. */
+    [data-playback="speaking"] .lamp {
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28);
+    }
+
     .play-btn {
-      min-height: 52px;
+      min-height: 48px;
     }
 
     .playback-status {
       min-height: 0;
+    }
+
+    /* A shorter editor keeps the word count above the pinned bar. */
+    .editor-input {
+      min-height: 12.5rem;
     }
   }
 

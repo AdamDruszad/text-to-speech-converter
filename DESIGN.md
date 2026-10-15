@@ -11,7 +11,7 @@ The page is a working tool, and its visual world is a radio studio. A voice read
 |-------|------|
 | `idle` (ready, stopped, finished, unsupported) | Unlit: dark `--lamp-off` lens, `--lamp-bulb` bulb, `--lamp-off-ink` text, 1px inner edge |
 | `starting` | `--standby` amber, pulsing to `--standby-dim` (900ms alternate) |
-| `speaking` | `--live` red, white bulb and text; a 700ms over-bright flash as it lights, then light cast below it |
+| `speaking` | `--live` red, white bulb and text; a 700ms over-bright flash as it lights, then a small cast light below it (none on phones, where Stop sits right under it) |
 
 The rule is one colour per state. Red and amber appear nowhere else on the page. Lamp colours change over 450ms with `--ease-out`. Under `prefers-reduced-motion`, every animation and transition is off.
 
@@ -67,6 +67,7 @@ Lamp text: `--text-small`, weight 720, width 72%, tracking 0.04em, uppercase. Co
 - **Text button** (`.text-btn`): 44px tall, `--text-small` at 600 weight, muted, with an underline that appears on hover.
 - **Primary button** (`.play-btn`): `--console-ink` fill on the console, ink text, 56px tall (52/48px on phones). Play and stop icons switch through CSS on `data-playback`.
 - **Solid button** (`.btn-solid`): `--solid` fill. Used in the dialog.
+- **Dialog**: title, then the message with a bold run-in lead ("A quick heads-up."), the same treatment as "The listening room." in the intro.
 - **Select**: native `<select>` with `appearance: none`, `--console-deep` fill and a chevron icon.
 - **Slider**: native range input. The track is drawn with three background layers: a 1× notch at `--default`, the fill up to `--pct` (set by `main.js`), and the empty track. The thumb is a 22px white disc with a 4px ring in the console colour.
 - **Icons**: inline SVG on a 24px grid, 1.75px stroke, round caps. Play and stop are filled.
