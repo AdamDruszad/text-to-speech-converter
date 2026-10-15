@@ -12,10 +12,12 @@ A browser-based speech app built with vanilla JavaScript, the Web Speech API, Ta
 - Stop playback and pending retries without letting old speech events restart the session.
 - Report empty input, missing voices and playback failures in an accessible dialog.
 - Labelled controls, live playback status, keyboard focus styles and reduced-motion support.
-- A responsive writing workspace with a dark default, an optional light theme, and a saved appearance preference.
+- A responsive writing workspace in light and dark themes that follows the system setting until you pick one; the choice is saved.
+- A cue lamp beside the Listen button shows the playback state: unlit when idle, amber while a voice starts, red while speaking. On phones the lamp, running time and Listen/Stop stay pinned to the bottom of the screen.
 - Adjustable reading speed and pitch, passed through to every speech attempt.
 - Example text, a clear action, live word/character counts, and an estimated reading time.
-- Inline SVG icons and Manrope / Instrument Serif typography via Google Fonts; no icon-font dependency.
+- Inline SVG icons and one self-hosted typeface (Archivo, variable weight and width, via Fontsource); no third-party font or icon requests.
+- Open Graph and Twitter card metadata with a social preview image.
 
 ## Run locally
 
@@ -42,7 +44,7 @@ Deploy the generated `dist/` directory. The app has no application backend.
 
 Available voices, languages and speech reliability depend on the browser and operating system. Some device-provided voices use network services, so offline availability is not guaranteed. This app does not choose or operate the browser's speech provider.
 
-Reading time is a rough estimate based on 150 words per minute at normal speed. Voices can interpret speed and pitch differently. Voice settings and the editor are locked during playback; Stop makes them editable again. The theme is the only preference saved in local storage.
+Reading time is a rough estimate based on 150 words per minute at normal speed. Voices can interpret speed and pitch differently. Voice settings and the editor are locked during playback; Stop makes them editable again. The theme is the only preference saved in local storage; without a saved choice the page follows the system light/dark setting.
 
 The chosen voice is tried first. A startup timeout or retryable startup error moves to the next voice; Stop cancels the whole session. An error after speech has started ends playback with a message instead of replaying the passage from the beginning. Startup retries may use a different language, so select a suitable voice for the text.
 
@@ -54,7 +56,8 @@ Automatic tests use a simulated speech engine. They do **not** establish full Ch
 - `src/main.js`: voice selection, form controls, status and error dialog.
 - `tests/speech.test.js`: deterministic speech-event and timer tests.
 - `tests/ui.test.js`: JSDOM checks for feature detection, voice refresh and controls.
-- `src/style.css`: responsive layout, contrast and interaction styles.
+- `src/style.css`: design tokens (type, spacing, colour per theme), components and responsive layout.
+- `REDESIGN_INVENTORY.md` / `AUDIT.md`: the feature contract and the audit behind the current design.
 
 ## License
 
