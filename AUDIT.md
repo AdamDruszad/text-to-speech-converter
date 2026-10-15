@@ -56,4 +56,27 @@ Disciplines borrowed from the directions this one beat (`impeccable concept-seed
 
 ## Scores after the redesign
 
-_Filled in after verification (step 5)._
+Evidence: `docs/redesign-screenshots/after/` (`dark-home-*`, `light-home-*`, `states/`, `phone/` viewport captures at four scroll positions, `extra/` at 320, 768, 1024, 1280 and 1920px), `REDESIGN_INVENTORY.md` (66/66 scripted checks), `npm test` 21/21, `npm run build` clean.
+
+| Area | Before | After | What changed |
+|------|------:|------:|--------------|
+| Visual design & consistency | 6 | 8 | One family on a named type scale of 8 tokens plus 3 one-off sizes for the wordmark and the phone time readout. Nothing is below 15px (before: 14 ad-hoc sizes from 8px). The studio-blue console and the cue lamp give the tool an identity tied to what it does. Red means live and amber means standby, and neither colour is used for anything else. Misleading "↗" arrows and repeated "01" numbering are gone. |
+| UX & navigation | 5 | 8 | Playback state is visible at a glance: the lamp is unlit, amber or red. The editor tints while it is locked. On phones Listen/Stop stays on screen at every scroll position (`after/phone/*`). Kept as-is: the modal for empty text (tested behaviour). |
+| Responsiveness / mobile | 6 | 9 | No overflow from 320 to 1920px (the 44px overflow at 320px found during verification is fixed). The sticky transport bar works on phones. Hint and note text are no longer hidden on smaller screens. Every target is at least 44×44px. |
+| Accessibility | 6 | 9 | All text is at least 15px. Every small-text pair is ≥ 6:1 (muted on paper 7.31:1 light / 7.44:1 dark; console help 7.22:1; lit lamp 5.18:1). The slider track is ≥ 3.2:1. The theme follows the OS preference. Read time has a real text label instead of `aria-label` on a span. Focus rings are themed per surface and verified on every control. Hover styles apply only on pointers that can hover. |
+| Performance | 7 | 8 | No third-party requests (was 3 requests and 59 kB from Google, render-blocking). The font is now one first-party 90 kB variable WOFF2 (the width axis carries the design), and other subsets load only when their characters appear. JS is unchanged at 9.8 kB; CSS is 22.6 kB (6.0 kB gzip). The unused `icons.svg` is no longer shipped. Trade-off: about 30 kB more font bytes than before, in exchange for two fewer origins and no blocking stylesheet. |
+| Code quality & structure | 6 | 8 | The stylesheet is readable, in `@layer base` and `@layer components` with named tokens, and Tailwind's `@theme` defines the font. Icons switch in CSS (no `innerHTML`). The dead toggle and rules are removed. Two new tests cover the theme default and the slider fill. `src/speech-controller.js` is untouched. |
+| SEO basics | 5 | 9 | Canonical URL, Open Graph and Twitter card tags, a 1200×630 social image and an apple-touch icon. Title, description, `lang` and a single `h1` are kept. |
+| Security red flags | 8 | 8 | No change to the logic; the Google Fonts IP leak is removed. The remaining items are for the owner (below). |
+
+### Detector and review notes
+
+- `impeccable detect` flagged `cramped-padding` on `.console`. It is a false positive: the console's children carry their own 16–28px inset.
+- It also flagged `dark-glow` for the red shadow under the lit lamp. That is the light a lit cue lamp casts (offset 10px, negative spread, only while speaking), and it is kept on purpose.
+
+### Still open (owner's call)
+
+1. **Network voices and privacy.** Voices that "need an internet connection" (Google voices in Chrome, Microsoft "Online (Natural)" voices in Edge) send the text to that vendor. `SpeechSynthesisVoice.localService` tells you which voices these are. Consider marking them in the voice list, or saying so in the help text.
+2. **No Content-Security-Policy.** The app now loads nothing from other origins, so a strict policy is easy, for example a header in `vercel.json`: `default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self' 'sha256-…'` (the inline theme script needs its hash).
+3. **Empty-text modal.** An inline message next to the editor would interrupt less than the current dialog. That changes tested behaviour, so it was left alone.
+4. **`src/assets/logo.png`** (1.4 MB) is not used anywhere and is not bundled. Delete it, or use it, for example as the portfolio thumbnail.

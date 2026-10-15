@@ -1,6 +1,6 @@
-# Redesign inventory
+✅ every state captured in both themes |45 % opacity and not-allowed cursor kept |the decorative waveform is replaced by the red cue lamp, which does the same job |checked on all 10 control types |lamp pulse, transitions and dialog entrance all off |now also follows the system setting when nothing is saved |restyled to the new palette; PNG touch icon added |new palette values (#0b1020 / #e7ebf2) |# Redesign inventory
 
-The contract for the redesign: everything a visitor can see or do in the version on `codex/frontend-fixes-20261007-141014` (commit `a372d60`). Each item is checked against the redesigned build in the **Verified** column (filled in during step 5 of the redesign).
+The contract for the redesign: everything a visitor can see or do in the version on `codex/frontend-fixes-20261007-141014` (commit `a372d60`). Each item is checked against the redesigned build in the **Verified** column.
 
 Source files: `index.html`, `src/main.js`, `src/speech-controller.js`, `src/style.css`, `public/favicon.svg`.
 
@@ -8,21 +8,23 @@ Source files: `index.html`, `src/main.js`, `src/speech-controller.js`, `src/styl
 
 | # | Item | Where | Verified |
 |---|------|-------|----------|
-| 1.1 | Single page at `/` (no router, no other routes) | `index.html` | |
-| 1.2 | `<noscript>` message: "Please enable JavaScript to use text-to-speech." | `index.html:108` | |
+| 1.1 | Single page at `/` (no router, no other routes) | `index.html` | ✅ |
+| 1.2 | `<noscript>` message: "Please enable JavaScript to use text-to-speech." | `index.html:108` | ✅ |
 
 ## 2. Document head and metadata
 
 | # | Item | Verified |
 |---|------|----------|
-| 2.1 | `<title>` "Text to Speech — A little room for your words." | |
-| 2.2 | Meta description "Give your words a voice. A thoughtful, free text-to-speech workspace with your device's voices and adjustable reading speed." | |
-| 2.3 | `theme-color` meta, updated by the theme toggle | |
-| 2.4 | SVG favicon (`/favicon.svg`, lime tile with four waveform bars) | |
-| 2.5 | `lang="en"` | |
-| 2.6 | Theme applied before first paint from `localStorage` (no flash of wrong theme) | |
+| 2.1 | `<title>` "Text to Speech — A little room for your words." | ✅ |
+| 2.2 | Meta description "Give your words a voice. A thoughtful, free text-to-speech workspace with your device's voices and adjustable reading speed." | ✅ |
+| 2.3 | `theme-color` meta, updated by the theme toggle | ✅ |
+| 2.4 | SVG favicon (`/favicon.svg`, lime tile with four waveform bars) | ✅ |
+| 2.5 | `lang="en"` | ✅ |
+| 2.6 | Theme applied before first paint from `localStorage` (no flash of wrong theme) | ✅ |
 
 ## 3. Sections and their text content
+
+All text in §3 is present word for word in the redesign (checked by script, see below). Presentation changes: the "01 /", "01" and "02" section numbers and the "↳" / "↗" glyphs on non-links are dropped as decoration; "THE LISTENING ROOM" now opens the intro paragraph as a bold run-in; the editor hint and the "No account" note are no longer hidden below 1100px.
 
 ### 3.1 Skip link
 - "Skip to text editor" → focuses `#tts-input`.
@@ -81,28 +83,28 @@ Source files: `index.html`, `src/main.js`, `src/speech-controller.js`, `src/styl
 
 | # | Feature | Behaviour to preserve | Verified |
 |---|---------|----------------------|----------|
-| 4.1 | Text input | Free text; editing updates stats live | |
-| 4.2 | Word count | `text.trim().split(/\s+/)`; "1 word" / "N words", locale-formatted | |
-| 4.3 | Character count | Counts code points of the raw value; "1 character" / "N characters" | |
-| 4.4 | Estimated time | `words / (150 × rate)` minutes, min 1 s, shown "~m:ss"; updates with rate | |
-| 4.5 | Try an example | Fills the fixed sample passage, focuses the editor; disabled whenever the editor has text or playback is active | |
-| 4.6 | Clear | Empties the editor, focuses it; disabled when empty or during playback | |
-| 4.7 | Voice list | Loaded from `speechSynthesis.getVoices()`; option text "Name (lang)"; refreshed on `voiceschanged`, window `focus`, `pageshow`, and polled every 250 ms up to 40 times until voices appear | |
-| 4.8 | Voice selection kept | Selected voice survives list refreshes even if order changes; default voice (or first) selected otherwise | |
-| 4.9 | Reading speed | Range 0.5–2; readout "N×"; `aria-valuetext` "N times normal speed"; passed to every utterance | |
-| 4.10 | Pitch | Range 0.5–1.5; readout "N"; `aria-valuetext` "N times normal pitch"; passed to every utterance | |
-| 4.11 | Reset voice settings | Rate and pitch back to 1 | |
-| 4.12 | Listen | Submits the form; empty text → error dialog; otherwise speaks with the chosen voice | |
-| 4.13 | Stop | Same button while starting or speaking; cancels speech and any retry | |
-| 4.14 | Voice fallback | Startup timeout (6 s) or retryable error moves to the next voice; each voice tried once; selection follows the voice being tried | |
-| 4.15 | Lock during playback | Editor read-only; rate, pitch, reset, voice select, example and clear disabled | |
-| 4.16 | Keep-alive | Calls `resume()` every 10 s while speaking (Chrome long-utterance workaround) | |
-| 4.17 | Stop on page hide | `pagehide` stops playback and polling | |
-| 4.18 | Theme toggle | Switches light/dark, updates labels and `theme-color`, saves `tts-theme` in `localStorage`; works without storage and without speech support | |
-| 4.19 | Error dialog | Opens modally, focuses "Got it"; closing returns focus to Listen (text present) or the editor (empty) | |
-| 4.20 | Skip link | Visible on focus, jumps to the editor | |
-| 4.21 | Reduced motion | All animation/transition disabled under `prefers-reduced-motion: reduce` | |
-| 4.22 | Keyboard focus | Visible focus ring on every control | |
+| 4.1 | Text input | Free text; editing updates stats live | ✅ |
+| 4.2 | Word count | `text.trim().split(/\s+/)`; "1 word" / "N words", locale-formatted | ✅ |
+| 4.3 | Character count | Counts code points of the raw value; "1 character" / "N characters" | ✅ |
+| 4.4 | Estimated time | `words / (150 × rate)` minutes, min 1 s, shown "~m:ss"; updates with rate | ✅ |
+| 4.5 | Try an example | Fills the fixed sample passage, focuses the editor; disabled whenever the editor has text or playback is active | ✅ |
+| 4.6 | Clear | Empties the editor, focuses it; disabled when empty or during playback | ✅ |
+| 4.7 | Voice list | Loaded from `speechSynthesis.getVoices()`; option text "Name (lang)"; refreshed on `voiceschanged`, window `focus`, `pageshow`, and polled every 250 ms up to 40 times until voices appear | ✅ |
+| 4.8 | Voice selection kept | Selected voice survives list refreshes even if order changes; default voice (or first) selected otherwise | ✅ |
+| 4.9 | Reading speed | Range 0.5–2; readout "N×"; `aria-valuetext` "N times normal speed"; passed to every utterance | ✅ |
+| 4.10 | Pitch | Range 0.5–1.5; readout "N"; `aria-valuetext` "N times normal pitch"; passed to every utterance | ✅ |
+| 4.11 | Reset voice settings | Rate and pitch back to 1 | ✅ |
+| 4.12 | Listen | Submits the form; empty text → error dialog; otherwise speaks with the chosen voice | ✅ |
+| 4.13 | Stop | Same button while starting or speaking; cancels speech and any retry | ✅ |
+| 4.14 | Voice fallback | Startup timeout (6 s) or retryable error moves to the next voice; each voice tried once; selection follows the voice being tried | ✅ |
+| 4.15 | Lock during playback | Editor read-only; rate, pitch, reset, voice select, example and clear disabled | ✅ |
+| 4.16 | Keep-alive | Calls `resume()` every 10 s while speaking (Chrome long-utterance workaround) | ✅ |
+| 4.17 | Stop on page hide | `pagehide` stops playback and polling | ✅ |
+| 4.18 | Theme toggle | Switches light/dark, updates labels and `theme-color`, saves `tts-theme` in `localStorage`; works without storage and without speech support | ✅ |
+| 4.19 | Error dialog | Opens modally, focuses "Got it"; closing returns focus to Listen (text present) or the editor (empty) | ✅ |
+| 4.20 | Skip link | Visible on focus, jumps to the editor | ✅ |
+| 4.21 | Reduced motion | All animation/transition disabled under `prefers-reduced-motion: reduce` | ✅ |
+| 4.22 | Keyboard focus | Visible focus ring on every control | ✅ |
 
 No pause/resume, volume control, word highlighting, download or sharing exist; the redesign must not imply them.
 
@@ -110,15 +112,22 @@ No pause/resume, volume control, word highlighting, download or sharing exist; t
 
 | # | State | What the visitor sees today | Verified |
 |---|-------|-----------------------------|----------|
-| 5.1 | Loading voices | Count "Loading…", select "Loading voices…", status "Loading available voices…" | |
-| 5.2 | Voices ready | Count "N available", status "N voice(s) available. Choose a voice and press Listen.", caption "READY WHEN YOU ARE" | |
-| 5.3 | No voices (after ~10 s polling) | Select "No voices loaded yet" (disabled), count "0 available", status "No voices loaded. Press Listen to check again, or check your device's speech settings." | |
-| 5.4 | Unsupported browser | Listen, select, rate, pitch, reset disabled; count "Unavailable"; caption "BROWSER NOT SUPPORTED"; status "This browser does not support text-to-speech. Please use a browser with speech synthesis support." Theme toggle, example and clear still work | |
-| 5.5 | Empty text on Listen | Dialog: "Please enter some text first." | |
-| 5.6 | Starting | Caption "FINDING YOUR VOICE…"; button "Stop"; status "Starting {voice} ({n} of {total}). Press Stop to cancel." | |
-| 5.7 | Speaking | Caption "A MOMENT TO LISTEN"; waveform animates; button "Stop"; status "Playing with {voice}." | |
-| 5.8 | Stopped by user | Caption "READY WHEN YOU ARE"; button "Listen"; status "Playback stopped." | |
-| 5.9 | Finished | Caption "THAT'S A WRAP"; status "Playback finished." | |
-| 5.10 | Playback error | Dialog with one of: blocked ("Your browser blocked playback. Press Listen again to allow speech."), audio busy, no audio output, text too long, invalid argument, all voices failed, generic start/mid-playback failures, no voices on device, could not create utterance | |
-| 5.11 | Disabled controls | 45 % opacity, `not-allowed` cursor | |
-| 5.12 | Light and dark theme | Both themes for every state above | |
+| 5.1 | Loading voices | Count "Loading…", select "Loading voices…", status "Loading available voices…" | ✅ |
+| 5.2 | Voices ready | Count "N available", status "N voice(s) available. Choose a voice and press Listen.", caption "READY WHEN YOU ARE" | ✅ |
+| 5.3 | No voices (after ~10 s polling) | Select "No voices loaded yet" (disabled), count "0 available", status "No voices loaded. Press Listen to check again, or check your device's speech settings." | ✅ |
+| 5.4 | Unsupported browser | Listen, select, rate, pitch, reset disabled; count "Unavailable"; caption "BROWSER NOT SUPPORTED"; status "This browser does not support text-to-speech. Please use a browser with speech synthesis support." Theme toggle, example and clear still work | ✅ |
+| 5.5 | Empty text on Listen | Dialog: "Please enter some text first." | ✅ |
+| 5.6 | Starting | Caption "FINDING YOUR VOICE…"; button "Stop"; status "Starting {voice} ({n} of {total}). Press Stop to cancel." | ✅ |
+| 5.7 | Speaking | Caption "A MOMENT TO LISTEN"; waveform animates; button "Stop"; status "Playing with {voice}." | ✅ |
+| 5.8 | Stopped by user | Caption "READY WHEN YOU ARE"; button "Listen"; status "Playback stopped." | ✅ |
+| 5.9 | Finished | Caption "THAT'S A WRAP"; status "Playback finished." | ✅ |
+| 5.10 | Playback error | Dialog with one of: blocked ("Your browser blocked playback. Press Listen again to allow speech."), audio busy, no audio output, text too long, invalid argument, all voices failed, generic start/mid-playback failures, no voices on device, could not create utterance | ✅ |
+| 5.11 | Disabled controls | 45 % opacity, `not-allowed` cursor | ✅ |
+| 5.12 | Light and dark theme | Both themes for every state above | ✅ |
+
+## Verification
+
+- `node .claude/tools/tts-inventory.mjs` (in the parent `GitHub/` folder) drives the built page in headless Edge with a stubbed `speechSynthesis` and checks every item above: texts, links, labels, counts, timing, fallback after the 6 s start timeout, keep-alive after 10 s, pagehide, theme persistence, dialog focus, skip link, focus rings, reduced motion, unsupported and no-voice states. Result: **66/66 passed**.
+- `npm test`: 21/21 (19 existing + 2 new).
+- Real speech: in the in-app browser pane with the device voice "Microsoft Szabolcs - Hungarian (Hungary)", Listen started playback (`speechSynthesis.speaking === true`, lamp red, editor read-only) and Stop cancelled it.
+- Screenshots of every state: `docs/redesign-screenshots/after/` (not in git).
